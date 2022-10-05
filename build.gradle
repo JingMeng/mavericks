@@ -1,35 +1,30 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.airbnb.mvrx.AndroidMetaModulePlugin
 
 buildscript {
+
     repositories {
         google()
-        mavenCentral()
+        jcenter()
     }
     dependencies {
-        classpath libs.androidGradle
-        classpath libs.anvilGradle
-        classpath libs.kotlinGradle
-        classpath libs.hiltGradle
+        classpath "com.android.tools.build:gradle:${Versions.gradlePlugin}"
+        classpath "org.jetbrains.kotlin:kotlin-android-extensions:${Versions.kotlin}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
 
         // Upload with:
-        // ./gradlew clean assemble uploadArchives --no-daemon --no-parallel
-        classpath libs.mavenPublishGradle
-        // Dokka is needed on classpath for vanniktech publish plugin
-        classpath libs.dokkaGradle
+        // ./gradlew clean uploadArchives --no-daemon --no-parallel
+        classpath "com.vanniktech:gradle-maven-publish-plugin:0.11.1"
     }
 
     configurations.all {
         resolutionStrategy {
-            force "net.sf.proguard:proguard-gradle:_"
+            // Use Proguard 6.2.0
+            force "net.sf.proguard:proguard-gradle:6.2.0"
         }
     }
 }
 
-plugins {
-    id("io.gitlab.arturbosch.detekt")
-}
-
-apply plugin: 'io.gitlab.arturbosch.detekt'
+plugins.apply(AndroidMetaModulePlugin.class)
 
 allprojects {
     version = VERSION_NAME
@@ -37,51 +32,7 @@ allprojects {
 
     repositories {
         google()
-        mavenCentral()
+        jcenter()
+        maven { url "https://jitpack.io" }
     }
 }
-
-subprojects { project ->
-    apply from: "$rootDir/detekt.gradle"
-    afterEvaluate {
-        tasks.withType(KotlinCompile).configureEach { task ->
-            kotlinOptions {
-                jvmTarget = JavaVersion.VERSION_1_8.toString()
-            }
-        }
-
-        if (project.hasProperty("android")) {
-            android {
-                compileSdkVersion  32
-
-                defaultConfig {
-                    // Allow projects to override this.
-                    if (minSdk == null) {
-                        minSdk 16
-                    }
-                    //noinspection ExpiredTargetSdkVersion
-                    targetSdk 29
-                }
-
-                lintOptions {
-                    abortOnError true
-                    textReport true
-                    textOutput("stdout")
-                    lintConfig file("${project.rootDir}/lint.xml")
-                }
-
-                compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_1_8
-                    targetCompatibility JavaVersion.VERSION_1_8
-                }
-
-                sourceSets {
-                    main.java.srcDirs += "src/main/kotlin"
-                    test.java.srcDirs += "src/test/kotlin"
-                }
-            }
-        }
-    }
-}
-
-apply from: 'gradle/jacoco.gradle'

@@ -1,5 +1,7 @@
 repositories {
     google()
+    mavenCentral()
+    maven(url= "https://www.jitpack.io" )
     maven(url = "https://plugins.gradle.org/m2/")
     mavenCentral()
     jcenter()

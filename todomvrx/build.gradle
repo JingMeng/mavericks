@@ -33,9 +33,9 @@ dependencies {
     implementation Libraries.rxJava
     implementation project(":mvrx")
 
-    debugImplementation Libraries.debugDb
+//    debugImplementation Libraries.debugDb
 
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.mockitoKotlin
-    testImplementation project(":testing")
+//    testImplementation project(":testing")
 }

@@ -17,6 +17,7 @@
 package com.airbnb.mvrx.todomvrx
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.widget.PopupMenu
 import android.view.Menu
 import android.view.MenuInflater
@@ -33,6 +34,7 @@ import com.airbnb.mvrx.todomvrx.views.fullScreenMessageView
 import com.airbnb.mvrx.todomvrx.views.header
 import com.airbnb.mvrx.todomvrx.views.horizontalLoader
 import com.airbnb.mvrx.todomvrx.views.taskItemView
+import com.airbnb.mvrx.withState
 
 data class TaskListState(val filter: TaskListFilter = TaskListFilter.All) : MvRxState
 
@@ -57,6 +59,12 @@ class TaskListFragment : BaseFragment() {
 
     }
 
+    override fun invalidate() = withState(viewModel) {
+        Log.i("TaskListFragment789", "-----1111------${it.count}-------------")
+
+        Unit
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.tasks_fragment_menu, menu)
     }
@@ -68,47 +76,60 @@ class TaskListFragment : BaseFragment() {
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun epoxyController() = simpleController(viewModel, taskListViewModel) { state, taskListState ->
-        // We always want to show this so the content won't snap up when the loader finishes.
-        horizontalLoader {
-            id("loader")
-            loading(state.isLoading)
-        }
-
-        if (state.tasks.isEmpty() && !state.isLoading) {
-            val (title, iconRes) = when (taskListState.filter) {
-                TaskListFilter.All -> R.string.no_tasks_all to R.drawable.ic_assignment_turned_in_24dp
-                TaskListFilter.Active -> R.string.no_tasks_active to R.drawable.ic_check_circle_24dp
-                TaskListFilter.Completed -> R.string.no_tasks_completed to R.drawable.ic_verified_user_24dp
-            }
-            fullScreenMessageView {
-                id("empty_message")
-                iconRes(iconRes)
-                title(title)
-            }
-        } else if (!(state.isLoading && state.tasks.isEmpty())) {
-            header {
-                id("header")
-                title(when (taskListState.filter) {
-                    TaskListFilter.All -> R.string.label_all
-                    TaskListFilter.Active -> R.string.label_active
-                    TaskListFilter.Completed -> R.string.label_completed
-                })
+    override fun epoxyController() =
+        simpleController(viewModel, taskListViewModel) { state, taskListState ->
+            // We always want to show this so the content won't snap up when the loader finishes.
+            horizontalLoader {
+                id("loader")
+                loading(state.isLoading)
             }
 
-            state.tasks
-                .filter(taskListState.filter::matches)
-                .forEach { task ->
-                    taskItemView {
-                        id(task.id)
-                        title(task.title)
-                        checked(task.complete)
-                        onCheckedChanged { completed -> viewModel.setComplete(task.id, completed) }
-                        onClickListener { _ -> navigate(R.id.detailFragment, TaskDetailArgs(task.id)) }
-                    }
+            if (state.tasks.isEmpty() && !state.isLoading) {
+                val (title, iconRes) = when (taskListState.filter) {
+                    TaskListFilter.All -> R.string.no_tasks_all to R.drawable.ic_assignment_turned_in_24dp
+                    TaskListFilter.Active -> R.string.no_tasks_active to R.drawable.ic_check_circle_24dp
+                    TaskListFilter.Completed -> R.string.no_tasks_completed to R.drawable.ic_verified_user_24dp
                 }
+                fullScreenMessageView {
+                    id("empty_message")
+                    iconRes(iconRes)
+                    title(title)
+                }
+            } else if (!(state.isLoading && state.tasks.isEmpty())) {
+                header {
+                    id("header")
+                    title(
+                        when (taskListState.filter) {
+                            TaskListFilter.All -> R.string.label_all
+                            TaskListFilter.Active -> R.string.label_active
+                            TaskListFilter.Completed -> R.string.label_completed
+                        }
+                    )
+                }
+
+                state.tasks
+                    .filter(taskListState.filter::matches)
+                    .forEach { task ->
+                        taskItemView {
+                            id(task.id)
+                            title(task.title)
+                            checked(task.complete)
+                            onCheckedChanged { completed ->
+                                viewModel.setComplete(
+                                    task.id,
+                                    completed
+                                )
+                            }
+                            onClickListener { _ ->
+                                navigate(
+                                    R.id.detailFragment,
+                                    TaskDetailArgs(task.id)
+                                )
+                            }
+                        }
+                    }
+            }
         }
-    }
 
     private fun showFilteringPopUpMenu() {
         PopupMenu(requireContext(), requireActivity().findViewById<View>(R.id.menu_filter)).run {

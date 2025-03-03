@@ -51,6 +51,7 @@ abstract class BaseFragment : BaseMvRxFragment() {
         epoxyController.onSaveInstanceState(outState)
     }
 
+
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.selectSubscribe(TasksState::tasks, TasksState::lastEditedTask) { tasks, lastEditedTask ->

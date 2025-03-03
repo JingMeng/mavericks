@@ -54,6 +54,7 @@ class TaskListFragment : BaseFragment() {
         fab.setOnClickListener {
             navigate(R.id.addEditFragment, AddEditTaskArgs())
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

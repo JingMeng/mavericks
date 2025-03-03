@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.8">
+      <module name="mavericks.mvrx-compose" target="11" />
+      <module name="mavericks.mvrx-hilt" target="11" />
+      <module name="mavericks.mvrx-launcher" target="11" />
+      <module name="mavericks.mvrx-mocking" target="11" />
+      <module name="mavericks.mvrx-navigation" target="11" />
+      <module name="mavericks.mvrx-rxjava2" target="11" />
+      <module name="mavericks.mvrx-testing" target="11" />
+      <module name="mavericks.sample-anvil" target="11" />
+      <module name="mavericks.sample-anvilannotations" target="11" />
+      <module name="mavericks.sample-anvilannotations.main" target="11" />
+      <module name="mavericks.sample-anvilannotations.test" target="11" />
+      <module name="mavericks.sample-anvilcodegen" target="11" />
+      <module name="mavericks.sample-anvilcodegen.main" target="11" />
+      <module name="mavericks.sample-anvilcodegen.test" target="11" />
+      <module name="mavericks.sample-compose" target="11" />
+      <module name="mavericks.sample-counter" target="11" />
+      <module name="mavericks.sample-dagger" target="11" />
+      <module name="mavericks.sample-dogs" target="11" />
+      <module name="mavericks.sample-hilt" target="11" />
+      <module name="mavericks.sample-navigation" target="11" />
+      <module name="mavericks.sample-todo" target="11" />
+      <module name="mavericks.utils-view-binding" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

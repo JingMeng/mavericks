@@ -7,6 +7,7 @@ import android.os.Parcelable
 import java.io.Serializable
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
+import kotlin.math.ceil
 
 /**
  * Annotate a field in your [MavericksViewModel] state with [PersistState] to have it automatically persisted when Android kills your process
@@ -69,7 +70,7 @@ private fun <T : MavericksState> Class<out T>.getComponentNFunction(componentInd
         declaredMethods.firstOrNull { it.name.startsWith("$functionName\$") }
     }
         ?.also { it.isAccessible = true }
-        ?: error("Unable to find function $functionName in ${this@getComponentNFunction::class.simpleName}")
+        ?: error("Unable to find function $functionName in ${this@getComponentNFunction::class.java.name}")
 }
 
 private fun assertCollectionPersistability(value: Any?) {
@@ -88,7 +89,7 @@ private fun assertCollectionPersistability(value: Any?) {
 }
 
 private fun assertPersistable(item: Any) {
-    if (item !is Serializable && item !is Parcelable) error("Cannot parcel ${item::class.java.simpleName}")
+    if (item !is Serializable && item !is Parcelable) error("Cannot parcel ${item::class.java.name}")
 }
 
 private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
@@ -96,7 +97,8 @@ private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
         is Parcelable -> putParcelable(key, value)
         is Serializable -> putSerializable(key, value)
         null -> putString(key, null)
-        else -> error("Cannot persist $key. It must be null, Serializable, or Parcelable.")
+        // The null case is covered above so can avoid the null check here.
+        else -> error("Cannot persist '$key': Class ${value!!::class.java.name} must be null, Serializable, or Parcelable.")
     }
     return this
 }
@@ -128,7 +130,7 @@ fun <T : MavericksState> restorePersistedMavericksState(
     val fieldCount = constructor.parameterTypes.size
 
     // There is 1 bitmask for each block of 32 parameters.
-    val parameterBitMasks = IntArray(fieldCount / 32 + 1) { 0 }
+    val parameterBitMasks = IntArray(ceil(fieldCount / 32.0).toInt())
     val parameters = arrayOfNulls<Any?>(fieldCount)
     parameters[0] = initialState
     for (i in 0 until fieldCount) {

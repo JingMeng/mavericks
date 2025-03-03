@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.testing.TestLifecycleOwner
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -20,7 +21,7 @@ class MavericksLifecycleAwareFlowKtTest : BaseTest() {
     @Test
     fun testDoesntFlowFromCreate() = runTest(UnconfinedTestDispatcher()) {
         val flow = flowOf(1)
-        val owner = TestLifecycleOwner()
+        val owner = TestLifecycleOwner(Lifecycle.State.CREATED)
         val values = mutableListOf<Int>()
         val job = flow.flowWhenStarted(owner).onEach {
             values += it
@@ -145,5 +146,18 @@ class MavericksLifecycleAwareFlowKtTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.STARTED
 
         flowOf(1).flowWhenStarted(owner).collect()
+    }
+
+    @Test
+    fun testNullableFlow() = runTest(UnconfinedTestDispatcher()) {
+        val flow = flowOf<Int?>(null, null)
+        val owner = TestLifecycleOwner()
+        val values = mutableListOf<Int?>()
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
+        val job = flow.flowWhenStarted(owner).onEach {
+            values += it
+        }.launchIn(this)
+        assertEquals(listOf(null, null), values)
+        job.cancel()
     }
 }

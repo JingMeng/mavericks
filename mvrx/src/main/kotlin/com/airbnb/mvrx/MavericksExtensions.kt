@@ -14,7 +14,7 @@ import kotlin.reflect.KProperty
  *
  * Looks for [Mavericks.KEY_ARG] on the arguments of the fragments.
  */
-@Suppress("FunctionName")
+@Suppress("FunctionName", "DEPRECATION")
 @InternalMavericksApi
 fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(Mavericks.KEY_ARG)
 
@@ -74,7 +74,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
         if (parentFragment == null) {
             // Using ViewModelDoesNotExistException so mocking framework can intercept and mock the viewmodel in this case.
             throw ViewModelDoesNotExistException(
-                "There is no parent fragment for ${this::class.java.simpleName} so view model ${viewModelClass.simpleName} could not be found."
+                "There is no parent fragment for ${this::class.java.name} so view model ${viewModelClass.java.name} could not be found."
             )
         }
         var parent: Fragment? = parentFragment
@@ -136,7 +136,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
 
         @Suppress("DEPRECATION")
         val targetFragment =
-            requireNotNull(targetFragment) { "There is no target fragment for ${this::class.java.simpleName}!" }
+            requireNotNull(targetFragment) { "There is no target fragment for ${this::class.java.name}!" }
 
         MavericksViewModelProvider.get(
             viewModelClass = viewModelClass.java,
@@ -208,6 +208,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
  * This is similar to [fragmentViewModel] and [actvityViewModel] but used when a view model
  * is accessed directly from an activity itself.
  */
+@Suppress("DEPRECATION")
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.viewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
@@ -232,10 +233,14 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
 fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
     var value: V? = null
 
+    @Suppress("DEPRECATION")
     override fun getValue(thisRef: Fragment, property: KProperty<*>): V {
         if (value == null) {
             val args = thisRef.arguments
                 ?: throw IllegalArgumentException("There are no fragment arguments!")
+            // Sometimes the class loader of the arguments is java.lang.BootClassLoader and thus the args bundle
+            // cannot be loaded. Ensure that it has the same classloader as the Fragment.
+            args.classLoader = thisRef::class.java.classLoader
             val argUntyped = args.get(Mavericks.KEY_ARG)
             argUntyped
                 ?: throw IllegalArgumentException("Mavericks arguments not found at key _root_ide_package_.com.airbnb.mvrx.Mavericks.KEY_ARG!")
@@ -259,9 +264,13 @@ fun <V> argsOrNull() = object : ReadOnlyProperty<Fragment, V?> {
     var value: V? = null
     var read: Boolean = false
 
+    @Suppress("DEPRECATION")
     override fun getValue(thisRef: Fragment, property: KProperty<*>): V? {
         if (!read) {
             val args = thisRef.arguments
+            // Sometimes the class loader of the arguments is java.lang.BootClassLoader and thus the args bundle
+            // cannot be loaded. Ensure that it has the same classloader as the Fragment.
+            args?.classLoader = thisRef::class.java.classLoader
             val argUntyped = args?.get(Mavericks.KEY_ARG)
             @Suppress("UNCHECKED_CAST")
             value = argUntyped as? V

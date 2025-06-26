@@ -34,6 +34,12 @@ class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(Ordering
         }
     }
 
+    /**
+     * 这个是理解的，单线程，按照队里执行
+     *
+     *  setState 先到先执行
+     *
+     */
     @Test
     fun test1() = runBlocking {
         val calls = mutableListOf<String>()
@@ -47,6 +53,9 @@ class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(Ordering
         assertMatches(calls, "s1", "w1")
     }
 
+    /**
+     * 这个包裹一层与否和第一个是一致的，不产生影响
+     */
     @Test
     fun test2() = runBlocking {
         val calls = mutableListOf<String>()
@@ -63,6 +72,9 @@ class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(Ordering
         assertMatches(calls, "w1", "s1", "w2")
     }
 
+    /**
+     * 这个的执行就开始产生问题了
+     */
     @Test
     fun test3() = runBlocking {
         val calls = mutableListOf<String>()
@@ -169,6 +181,8 @@ class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(Ordering
         while (calls.size != expectedCalls.size) {
             delay(1)
         }
+
+        println("  assertMatches        ${expectedCalls.toList()}")
         assertEquals(expectedCalls.toList(), calls.toList())
     }
 }

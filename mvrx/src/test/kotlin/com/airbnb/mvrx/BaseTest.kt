@@ -50,6 +50,9 @@ abstract class BaseTest {
         Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(true)
     }
 
+    /**
+     * 就是创建的一个过程
+     */
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(
         savedInstanceState: Bundle? = null,
         args: Parcelable? = null,

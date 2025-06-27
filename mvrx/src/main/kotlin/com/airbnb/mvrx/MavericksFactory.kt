@@ -70,6 +70,10 @@ private fun <VM : MavericksViewModel<S>, S : MavericksState> createViewModel(
 private fun <VM : MavericksViewModel<S>, S : MavericksState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
     // If we are checking for a default ViewModel, we expect only a single default constructor. Any other case
     // is a misconfiguration and we will throw an appropriate error under further inspection.
+    println("----createDefaultViewModel----------${viewModelClass.constructors.size}--------------------------")
+    viewModelClass.constructors.forEach {
+        println("----createDefaultViewModel----------${it}--------------------------")
+    }
     if (viewModelClass.constructors.size == 1) {
         val primaryConstructor = viewModelClass.constructors[0]
         if (primaryConstructor.parameterTypes.size == 1 && primaryConstructor.parameterTypes[0].isAssignableFrom(state::class.java)) {

@@ -27,6 +27,7 @@ class MvRxArgsOrNullFragment : Fragment(), MavericksView {
 class MvRxFragmentTest : BaseTest() {
     @Test
     fun testByArgsWithArgs() {
+        //解构声明.md
         val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>(args = MvrxArgsTestArgs())
         Assert.assertEquals(0, fragment.args.count)
     }
@@ -37,12 +38,20 @@ class MvRxFragmentTest : BaseTest() {
         Assert.assertEquals(2, fragment.args.count)
     }
 
+    /**
+     * 没运行起来，应该是 args 这个地方的 getValue
+     *
+     *    value = argUntyped as V  这里报错导致的
+     */
     @Test(expected = ClassCastException::class)
     fun testByArgsSetWrongArgs() {
         val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>(args = MvrxArgsTestArgs2(2))
         fragment.args
     }
 
+    /**
+     * 和 args 的源码最后一行抛出的
+     */
     @Test(expected = IllegalArgumentException::class)
     fun testByArgsWithNoArgs() {
         val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>()

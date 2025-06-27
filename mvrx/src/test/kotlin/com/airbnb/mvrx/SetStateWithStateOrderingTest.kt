@@ -15,6 +15,13 @@ import org.junit.Test
 import java.util.concurrent.ConcurrentLinkedQueue
 
 data class OrderingState(val count: Int = 0) : MavericksState
+
+/**
+ * 结论是select 是有偏向性的，谁快选择谁，同步选择先注册的任务
+ *
+ * 具体的解释请看 Kotlin Select Expression.md
+ *
+ */
 class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(OrderingState()) {
 
     companion object {

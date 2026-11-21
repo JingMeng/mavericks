@@ -9,7 +9,7 @@
 ksp = { id = "com.google.devtools.ksp", version = "1.8.22-1.0.11" }
 
 [libraries]
-androidGradle = "com.android.tools.build:gradle:_"
+androidGradle = "com.android.tools.build:gradle:8.2.1"
 anvilGradle = "com.squareup.anvil:gradle-plugin:_"
 autoValue = "com.google.auto.value:auto-value:_"
 autoValueAnnotations = "com.google.auto.value:auto-value-annotations:_"

@@ -46,13 +46,13 @@ subprojects { project ->
     afterEvaluate {
         tasks.withType(KotlinCompile).configureEach { task ->
             kotlinOptions {
-                jvmTarget = JavaVersion.VERSION_1_8.toString()
+                jvmTarget = JavaVersion.VERSION_11.toString()
             }
         }
 
         if (project.hasProperty("android")) {
             android {
-                compileSdkVersion  33
+                compileSdkVersion  34
 
                 defaultConfig {
                     // Allow projects to override this.
@@ -60,7 +60,7 @@ subprojects { project ->
                         minSdk 16
                     }
                     //noinspection ExpiredTargetSdkVersion
-                    targetSdk 29
+                    targetSdk 34
                 }
 
                 lintOptions {
@@ -71,8 +71,8 @@ subprojects { project ->
                 }
 
                 compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_1_8
-                    targetCompatibility JavaVersion.VERSION_1_8
+                    sourceCompatibility JavaVersion.VERSION_11
+                    targetCompatibility JavaVersion.VERSION_11
                 }
 
                 sourceSets {
